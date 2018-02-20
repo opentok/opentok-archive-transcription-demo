@@ -1,0 +1,29 @@
+{
+  "name": "opentok-archive-transcription-demo",
+  "version": "0.0.0",
+  "description": "Archive Transcription demo for OpenTok",
+  "private": true,
+  "scripts": {
+    "start": "node server",
+    "test": "eslint ."
+  },
+  "author": "Kaustav Das Modak <kaustav.dasmodak@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@google-cloud/speech": "^1.1.0",
+    "@google-cloud/storage": "^1.6.0",
+    "aws-sdk": "^2.198.0",
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "fluent-ffmpeg": "^2.1.2",
+    "opentok": "^2.6.1"
+  },
+  "devDependencies": {
+    "eslint": "^4.18.0",
+    "eslint-config-standard": "^11.0.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-node": "^6.0.0",
+    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-standard": "^3.0.1"
+  }
+}
