@@ -5,6 +5,7 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const Archive = require('./archive')
+const OpenTok = require('opentok')
 
 // --- Parse configurations from environment variables ---
 const CONFIG = {}
@@ -32,8 +33,11 @@ for (const ev of reqEnvVars) {
 
 console.log(`Loading configuration:\n${JSON.stringify(CONFIG, null, 2)}\n`)
 
+// --- Create OpenTok instance ---
+const opentok = new OpenTok(CONFIG.OPENTOK_API_KEY, CONFIG.OPENTOK_API_SECRET)
+
 // --- Create Archive instance ---
-const archive = new Archive(CONFIG)
+const archive = new Archive(CONFIG, opentok)
 
 // --- Bootstrap Express Application ---
 
@@ -59,6 +63,86 @@ app.post('/ot_callback', (req, res) => {
       })
   }
   res.status(200).send()
+})
+
+/**
+ * List archives that have transcripts
+ */
+app.get('/api/archives', (req, res, next) => {
+  const page = req.query.page || 1
+  const limit = 50
+  const offset = (page - 1) * limit
+  opentok.listArchives({ offset: offset, count: limit }, function (err, archives, count) {
+    if (err) {
+      console.log(`Error fetching OpenTok archives. Reason: ${err}`)
+      next(err)
+      return
+    }
+    res.status(200).json({
+      message: 'List archives',
+      payload: {
+        page: page,
+        currentCount: archives.length,
+        totalCount: count,
+        archives: archives
+      }
+    })
+  })
+})
+
+app.get('/api/transcripts', (req, res, next) => {
+  archive.listAvailableTranscripts()
+    .then(data => {
+      res.status(200).json({
+        message: 'Available Transcripts',
+        payload: data
+      })
+    })
+    .catch(err => {
+      next(err)
+    })
+})
+
+/**
+ * Get transcription for given archive from S3
+ */
+app.get('/api/transcripts/:id', (req, res, next) => {
+  archive.getTranscript(req.params.id)
+    .then(data => {
+      if (req.query.download) {
+        res.attachment(`${req.params.id}.txt`)
+        res.status(200).send(data.content)
+      } else {
+        res.status(200).json({
+          message: 'Transcript',
+          payload: data
+        })
+      }
+    })
+    .catch(err => {
+      err.status = err.statusCode
+      next(err)
+    })
+})
+
+/**
+ * Delete archive by archive ID
+ */
+app.delete('/api/archives/:id', (req, res, next) => {
+  opentok.deleteArchive(req.params.id, function (err) {
+    if (err) {
+      console.log(`Error deleting archive ${req.params.id}. Reason: ${err}`)
+      next(err)
+      return
+    }
+    console.log(`Deleted archive ${req.params.id}`)
+    res.status(200).json({
+      message: 'Archive deleted',
+      payload: {
+        id: req.params.id
+      }
+    })
+  })
 })
 
 // error handler

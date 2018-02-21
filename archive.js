@@ -3,10 +3,11 @@ const ffmpeg = require('fluent-ffmpeg')
 const transcribe = require('./transcribe')
 
 class Archive {
-  constructor (conf) {
+  constructor (conf, opentok) {
     this.s3_bucket = conf.AWS_S3_BUCKET_NAME
     this.opentok_project_id = conf.OPENTOK_API_KEY
     this.s3 = new AWS.S3()
+    this.opentok = opentok // OpenTok instance
     this._conf = conf
   }
 
@@ -19,6 +20,37 @@ class Archive {
       .on('error', (e) => {
         console.log(`Error fetching archive. Reason: ${e}`)
       })
+  }
+
+  getTranscript (archiveId) {
+    const params = {
+      Bucket: this.s3_bucket,
+      Key: `${this.opentok_project_id}/transcripts/${archiveId}.json`
+    }
+    return new Promise((resolve, reject) => {
+      this.s3.getObject(params, (err, data) => {
+        if (err) {
+          reject(err)
+          return
+        }
+        resolve(JSON.parse(data.Body.toString('utf-8')))
+      })
+    })
+  }
+
+  listAvailableTranscripts () {
+    const params = {
+      Bucket: this.s3_bucket,
+      Prefix: `${this.opentok_project_id}/transcripts/`
+    }
+    return new Promise((resolve, reject) => {
+      this.s3.listObjectsV2(params, (err, data) => {
+        if (err) {
+          reject(err)
+        }
+        resolve(data.Contents.map(c => c.Key.split('/')[2].split('.')[0]))
+      })
+    })
   }
 
   extractAudio (archiveId, vidStream) {
@@ -46,7 +78,7 @@ class Archive {
     })
     const params = {
       Bucket: this.s3_bucket,
-      Key: `${this.opentok_project_id}/${archiveId}/transcript.json`,
+      Key: `${this.opentok_project_id}/transcripts/${archiveId}.json`,
       Body: content,
       ContentType: 'application/json'
     }
