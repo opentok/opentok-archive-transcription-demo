@@ -10,3 +10,4 @@ export AWS_SECRET_ACCESS_KEY="";
 # Google Cloud Speech API settings
 export GOOGLE_STORAGE_BUCKET="";
 export GOOGLE_APPLICATION_CREDENTIALS=`pwd`/service-account-file.json
+export GOOGLE_APPLICATION_CREDENTIALS_JSON="";

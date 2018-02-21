@@ -1,0 +1,45 @@
+
+{
+  "addons": [],
+  "buildpacks": [
+    {
+      "url": "https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest.git"
+    },
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "env": {
+    "OPENTOK_API_KEY": {
+      "description": "API key from OpenTok",
+      "required": true
+    },
+    "OPENTOK_API_SECRET": {
+      "description": "API secret from OpeTok",
+      "required": true
+    },
+    "AWS_S3_BUCKET_NAME": {
+      "description": "S3 bucket name where the archives are uploaded",
+      "required": true
+    },
+    "AWS_ACCESS_KEY_ID": {
+      "description": "AWS access key ID",
+      "required": true
+    },
+    "AWS_SECRET_ACCESS_KEY": {
+      "description": "AWS access key secret",
+      "required": true
+    },
+    "GOOGLE_STORAGE_BUCKET": {
+      "description": "Intermedia storage bucket name for Google cloud storage",
+      "required": true
+    },
+    "GOOGLE_APPLICATION_CREDENTIALS_JSON": {
+      "description": "Paste the complete content of Google Service Account Credentials JSON file",
+      "required": true
+    }
+  },
+  "formation": {},
+  "name": "opentok-archive-transcription-demo",
+  "scripts": {}
+}
