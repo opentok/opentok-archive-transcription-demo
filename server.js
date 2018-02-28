@@ -110,7 +110,7 @@ app.get('/api/transcripts', (req, res, next) => {
  * Get transcription for given archive from S3
  */
 app.get('/api/transcripts/:id', (req, res, next) => {
-  archive.getTranscript(req.params.id)
+  archive.getTranscriptMetadata(req.params.id)
     .then(data => {
       if (req.query.download) {
         res.attachment(`${req.params.id}.txt`)

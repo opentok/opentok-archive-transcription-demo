@@ -14,6 +14,8 @@ class Archive {
     this._conf = conf
     this._tmpdir = path.resolve('tmp')
 
+    this._archiveListCache = []
+
     // Instantiate `tmp` dir
     if (!fs.existsSync(this._tmpdir)) {
       fs.mkdirSync(this._tmpdir)
@@ -31,10 +33,18 @@ class Archive {
       })
   }
 
-  getTranscript (archiveId) {
+  s3TranscriptMetadataPath (archiveId) {
+    return `${this.opentok_project_id}/transcripts-metadata/${archiveId}.json`
+  }
+
+  s3TranscriptPath (archiveId, streamId = 'transcript') {
+    return `${this.opentok_project_id}/transcripts/${archiveId}/${streamId}.txt`
+  }
+
+  getTranscriptMetadata (archiveId) {
     const params = {
       Bucket: this.s3_bucket,
-      Key: `${this.opentok_project_id}/transcripts/${archiveId}.json`
+      Key: this.s3TranscriptMetadataPath(archiveId)
     }
     return new Promise((resolve, reject) => {
       this.s3.getObject(params, (err, data) => {
@@ -48,16 +58,46 @@ class Archive {
   }
 
   listAvailableTranscripts () {
-    const params = {
-      Bucket: this.s3_bucket,
-      Prefix: `${this.opentok_project_id}/transcripts/`
-    }
     return new Promise((resolve, reject) => {
+      if (this._archiveListCache.length) {
+        resolve(this._archiveListCache)
+        return
+      }
+      const params = {
+        Bucket: this.s3_bucket,
+        Prefix: `${this.opentok_project_id}/transcripts-metadata/`
+      }
       this.s3.listObjectsV2(params, (err, data) => {
         if (err) {
           reject(err)
         }
-        resolve(data.Contents.map(c => c.Key.split('/')[2].split('.')[0]))
+
+        const archives = data.Contents.map(c => c.Key.split('/')[2].split('.')[0])
+        const archiveMetadataList = []
+        const ok = () => {
+          this._archiveListCache = archiveMetadataList.sort((a, b) => {
+            return b.createdAt - a.createdAt
+          })
+          resolve(this._archiveListCache)
+        }
+        let counter = 0
+        for (const a of archives) {
+          this.getTranscriptMetadata(a)
+            .then(data => {
+              archiveMetadataList.push(data)
+              counter++
+              if (counter === archives.length) {
+                ok(archiveMetadataList)
+              }
+            })
+            .catch(err => {
+              console.log(`Error fetching transcript metadata. Reason: ${err}`)
+              counter++
+              if (counter === archives.length) {
+                ok(archiveMetadataList)
+              }
+            })
+        }
       })
     })
   }
@@ -82,7 +122,7 @@ class Archive {
   uploadTranscript (txt, archiveId, streamId = 'transcript') {
     const params = {
       Bucket: this.s3_bucket,
-      Key: `${this.opentok_project_id}/transcripts/${archiveId}/${streamId}.txt`,
+      Key: this.s3TranscriptPath(archiveId, streamId),
       Body: txt,
       ContentType: 'text/plain'
     }
@@ -111,20 +151,20 @@ class Archive {
     if (metadata.outputMode === 'composed') {
       content.transcripts.push({
         transcript: 'transcript.txt',
-        transcriptKey: `${this.opentok_project_id}/transcripts/${archiveId}/transcript.txt`
+        transcriptKey: this.s3TranscriptPath(archiveId)
       })
     } else {
       content.transcripts = streamsTranscribed.map(s => {
         return {
           transcript: `${s}.txt`,
-          transcriptKey: `${this.opentok_project_id}/transcripts/${archiveId}/${s}.txt`
+          transcriptKey: this.s3TranscriptPath(archiveId, s)
         }
       })
       content.manifest = manifest
     }
     const params = {
       Bucket: this.s3_bucket,
-      Key: `${this.opentok_project_id}/transcripts/${archiveId}/metadata.json`,
+      Key: this.s3TranscriptMetadataPath(archiveId),
       Body: JSON.stringify(content, null, 2),
       ContentType: 'application/json'
     }
@@ -134,6 +174,7 @@ class Archive {
           reject(err)
           return
         }
+        this._archiveListCache.unshift(content)
         resolve(data)
       })
     })
