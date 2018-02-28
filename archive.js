@@ -188,7 +188,6 @@ class Archive {
                 chunks.push(d)
               }).on('end', () => {
                 manifest = JSON.parse(Buffer.concat(chunks).toString('utf-8'))
-                filesProcessedCounter++
                 zipFile.readEntry()
               }).read()
             })
