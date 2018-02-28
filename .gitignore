@@ -1,3 +1,4 @@
 node_modules/
 /env.sh
 /service-account-file.json
+/tmp/*

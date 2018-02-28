@@ -56,9 +56,11 @@ app.use('/', express.static('./client'))
  * Callback handler for OpenTok archive monitoring
  */
 app.post('/ot_callback', (req, res) => {
-  console.log(`Archive id ${req.body.id} ${req.body.status}`)
+  if (req.body.id) {
+    console.log(`Archive id ${req.body.id} ${req.body.status} (mode: ${req.body.outputMode})`)
+  }
   if (req.body.status === 'uploaded') {
-    archive.process(req.body.id)
+    archive.processArchive(req.body)
       .catch(err => {
         console.log(`Error processing new archive upload. Reason: ${err}`)
       })

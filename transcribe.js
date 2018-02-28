@@ -5,7 +5,6 @@ if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON && process.env.GOOGLE_APPLIC
     credentials: JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON)
   }
 }
-console.log(googCredentials)
 const storage = require('@google-cloud/storage')(googCredentials)
 const gclient = new speech.SpeechClient(googCredentials)
 
@@ -27,7 +26,7 @@ function transcribeAudio (googFilename) {
   return gclient.longRunningRecognize({
     config: {
       encoding: 'FLAC',
-      languageCode: 'en-US'
+      languageCode: 'en-IN'
     },
     audio: { uri: googFilename }
   })
@@ -37,7 +36,11 @@ function transcribeAudio (googFilename) {
     })
     .then(data => {
       const res = data[0]
-      const transcript = res.results.map(r => r.alternatives[0].transcript.trim()).join('\n')
+      // const metadata = data[1]
+      const transcript = res.results.map(r => {
+        console.log(r.alternatives)
+        return r.alternatives[0].transcript.trim()
+      }).join('\n')
       return transcript
     })
     .catch(err => {
