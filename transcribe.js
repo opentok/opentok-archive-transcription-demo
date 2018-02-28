@@ -26,7 +26,7 @@ function transcribeAudio (googFilename) {
   return gclient.longRunningRecognize({
     config: {
       encoding: 'FLAC',
-      languageCode: 'en-IN'
+      languageCode: 'en-US'
     },
     audio: { uri: googFilename }
   })
