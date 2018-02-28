@@ -57,6 +57,22 @@ class Archive {
     })
   }
 
+  getTranscript (archiveId, streamId = 'transcript') {
+    const params = {
+      Bucket: this.s3_bucket,
+      Key: this.s3TranscriptPath(archiveId, streamId)
+    }
+    return new Promise((resolve, reject) => {
+      this.s3.getObject(params, (err, data) => {
+        if (err) {
+          reject(err)
+          return
+        }
+        resolve(data.Body.toString('utf-8'))
+      })
+    })
+  }
+
   listAvailableTranscripts () {
     return new Promise((resolve, reject) => {
       if (this._archiveListCache.length) {

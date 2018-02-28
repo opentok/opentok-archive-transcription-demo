@@ -107,20 +107,32 @@ app.get('/api/transcripts', (req, res, next) => {
 })
 
 /**
- * Get transcription for given archive from S3
+ * Get transcript metadata for given archive from S3
  */
-app.get('/api/transcripts/:id', (req, res, next) => {
-  archive.getTranscriptMetadata(req.params.id)
+app.get('/api/metadata/:archiveId', (req, res, next) => {
+  archive.getTranscriptMetadata(req.params.archiveId)
     .then(data => {
-      if (req.query.download) {
-        res.attachment(`${req.params.id}.txt`)
-        res.status(200).send(data.content)
-      } else {
-        res.status(200).json({
-          message: 'Transcript',
-          payload: data
-        })
-      }
+      res.status(200).json({
+        message: 'Transcript Metadata',
+        payload: data
+      })
+    })
+    .catch(err => {
+      err.status = err.statusCode
+      next(err)
+    })
+})
+
+/**
+ * Get the actual text of transcription for a given archive and its stream ID.
+ */
+app.get('/api/transcript/:archiveId/:streamId.txt', (req, res, next) => {
+  const streamId = req.params.streamId || 'transcript'
+  const archiveId = req.params.archiveId
+  archive.getTranscript(archiveId, streamId)
+    .then(data => {
+      res.type('text/plain')
+      res.status(200).send(data)
     })
     .catch(err => {
       err.status = err.statusCode
@@ -146,6 +158,13 @@ app.delete('/api/archives/:id', (req, res, next) => {
       }
     })
   })
+})
+
+// Handle 404
+app.use(function (req, res, next) {
+  const err = new Error('Not found')
+  err.status = 404
+  next(err)
 })
 
 // error handler
