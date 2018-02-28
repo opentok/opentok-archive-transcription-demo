@@ -32,8 +32,6 @@ for (const ev of reqEnvVars) {
   CONFIG[ev[0]] = process.env[ev[0]] || ev[1]
 }
 
-console.log(`Loading configuration:\n${JSON.stringify(CONFIG, null, 2)}\n`)
-
 // --- Create OpenTok instance ---
 const opentok = new OpenTok(CONFIG.OPENTOK_API_KEY, CONFIG.OPENTOK_API_SECRET)
 
