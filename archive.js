@@ -87,7 +87,9 @@ class Archive {
         if (err) {
           reject(err)
         }
-
+        if (!data.KeyCount) {
+          resolve([])
+        }
         const archives = data.Contents.map(c => c.Key.split('/')[2].split('.')[0])
         const archiveMetadataList = []
         const ok = () => {
