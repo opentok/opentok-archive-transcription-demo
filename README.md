@@ -4,6 +4,8 @@ This sample application shows how you can transcribe archives recorded with Open
 
 You can easily deploy this demo to Heroku using the deploy button below. Or, read on if you want to deploy it to anywhere else.
 
+This application includes the server to transcribe the archives, a HTTP JSON API to fetch the transcripts and a web client to access the transcripts.
+
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
 ## Workflow
