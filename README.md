@@ -33,5 +33,20 @@ You can easily deploy this demo to Heroku using the deploy button below. Or, rea
             - uploads text file to the same bucket in S3, naming it using stream ID
         - when all `.webm` files have been processed, it uploads a grouped metadata file to S3.
 
+## What you will need
+
+Setting this application up needs a few things:
+
+1. Get an [OpenTok account][signup].
+2. Create a new "Standard Project" in your OpenTok account. Note the API key for that project.
+3. Set up an AWS S3 bucket. Connect your OpenTok project to that S3 bucket using [these instructions][using-s3].
+4. Set up a Google Cloud account and configure it:
+    1. create a GCP console project and enable Google Speech API. See [the setup instructions here][gcp-quickstart]. Download the private key of the service account as JSON.
+    2. Under the same project, create a new Google Cloud storage bucket. Note its ID.
+
+When you deploy to Heroku, it will ask you for these information. Put them in the required fields and deploy.
 
 [gapi-async]: https://cloud.google.com/speech/docs/async-recognize
+[signup]: https://tokbox.com/account/user/signup
+[using-s3]: https://tokbox.com/developer/guides/archiving/using-s3.html
+[gcp-quickstart]: https://cloud.google.com/speech/docs/quickstart
