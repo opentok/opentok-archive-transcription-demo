@@ -1,6 +1,5 @@
 # OpenTok settings
 export OPENTOK_API_KEY="";
-export OPENTOK_API_SECRET="";
 
 # S3 settings
 export AWS_S3_BUCKET_NAME="";

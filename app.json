@@ -14,10 +14,6 @@
       "description": "API key from OpenTok",
       "required": true
     },
-    "OPENTOK_API_SECRET": {
-      "description": "API secret from OpeTok",
-      "required": true
-    },
     "AWS_S3_BUCKET_NAME": {
       "description": "S3 bucket name where the archives are uploaded",
       "required": true

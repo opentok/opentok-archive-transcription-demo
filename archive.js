@@ -6,11 +6,10 @@ const fs = require('fs')
 const path = require('path')
 
 class Archive {
-  constructor (conf, opentok) {
+  constructor (conf) {
     this.s3_bucket = conf.AWS_S3_BUCKET_NAME
     this.opentok_project_id = conf.OPENTOK_API_KEY
     this.s3 = new AWS.S3()
-    this.opentok = opentok // OpenTok instance
     this._conf = conf
     this._tmpdir = path.resolve('tmp')
 

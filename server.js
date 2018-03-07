@@ -14,7 +14,6 @@ const CONFIG = {}
 const reqEnvVars = [
   [ 'PORT', 8080 ],
   [ 'OPENTOK_API_KEY' ],
-  [ 'OPENTOK_API_SECRET' ],
   [ 'AWS_S3_BUCKET_NAME' ],
   [ 'AWS_ACCESS_KEY_ID' ],
   [ 'AWS_SECRET_ACCESS_KEY' ],
@@ -64,31 +63,6 @@ app.post('/ot_callback', (req, res) => {
       })
   }
   res.status(200).send()
-})
-
-/**
- * List archives that have transcripts
- */
-app.get('/api/archives', (req, res, next) => {
-  const page = req.query.page || 1
-  const limit = 50
-  const offset = (page - 1) * limit
-  opentok.listArchives({ offset: offset, count: limit }, function (err, archives, count) {
-    if (err) {
-      console.log(`Error fetching OpenTok archives. Reason: ${err}`)
-      next(err)
-      return
-    }
-    res.status(200).json({
-      message: 'List archives',
-      payload: {
-        page: page,
-        currentCount: archives.length,
-        totalCount: count,
-        archives: archives
-      }
-    })
-  })
 })
 
 app.get('/api/transcripts', (req, res, next) => {
