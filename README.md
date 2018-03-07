@@ -10,7 +10,7 @@ You can easily deploy this demo to Heroku using the deploy button below. Or, rea
 
 1. Configure OpenTok project:
     1. auto-upload archives to AWS S3
-    2. archive monitoring callback URL in OpenTok project set to `/ot_callback` of this application. For example, if this application is hosted at `https://foo.com`, then the URL will be `https://foo.com/ot_callback`.
+    2. archive monitoring callback URL in OpenTok project set to `/ot_callback` of this application.
 2. When a new archive is created:
     1. OpenTok uploads the archive file to S3
     2. OpenTok posts a callback to this application via the URL configured for archive monitoring
@@ -46,7 +46,40 @@ Setting this application up needs a few things:
 
 When you deploy to Heroku, it will ask you for these information. Put them in the required fields and deploy.
 
+**Post installation**: Once deployed, configure the OpenTok project's archive monitoring callback to point to `/ot_callback` of the deployed instance. For example, if your application URL is `https://foo.herokuapp.com/`, then the callback URL will be `https://foo.herokuapp.com/ot_callback`.
+
+## Code walk-through
+
+This is a NodeJS application. It uses AWS's NodeJS SDK for accessing S3 and Google Cloud's NodeJS SDK for accessing Google Speech API and Google Cloud Storage. It does not need access to the OpenTok's credentials because it depends on OpenTok to `POST` to the callback URL when an archive is ready to be processed.
+
+The main logic triggers when OpenTok posts a callback with new archive information to `/ot_callback`. This code is present in [`server.js`][server.js]:
+
+```js
+app.post('/ot_callback', (req, res) => {
+  if (req.body.status === 'uploaded') {
+    archive.processArchive(req.body)
+      .catch(err => {
+        console.log(`Error processing new archive upload. Reason: ${err}`)
+      })
+  }
+  res.status(200).send()
+})
+```
+
+`archive.processArchive()` is called whenever Opentok says notifies that an archive has been uploaded to S3. Rest of the processing happens in [`archive.js`][archive.js] and [`transcribe.js`][transcribe.js].
+
+Internally, `archive.processArchive()` switches based on whether the new archive is created in `composed` or `individual` output mode. It calls `archive.processIndividualOutput()` or `archive.processComposedOutput()` depending on the output mode. ([See here][archiving] for information on the two types of outputs for OpenTok archiving.)
+
+In both cases, they call [`transcribe.transcribeAudio()`][transcribe.js]. This function handles the actual transcription process with Google Speech API.
+
+The [server][server.js] also exposes a HTTP JSON API to fetch transcripts and their metadata stored in S3 and to list the APIs. Code for the minimal frontend is present in the [`client`][client] directory.
+
 [gapi-async]: https://cloud.google.com/speech/docs/async-recognize
 [signup]: https://tokbox.com/account/user/signup
 [using-s3]: https://tokbox.com/developer/guides/archiving/using-s3.html
 [gcp-quickstart]: https://cloud.google.com/speech/docs/quickstart
+[server.js]: server.js
+[archive.js]: archive.js
+[transcribe.js]: transcribe.js
+[archiving]: https://tokbox.com/developer/guides/archiving/#individual-stream-and-composed-archives
+[client]: client/
