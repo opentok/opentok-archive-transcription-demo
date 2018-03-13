@@ -2,6 +2,8 @@
 
 This sample application shows how you can transcribe archives recorded with OpenTok using Google Speech API. It integrates with AWS S3 and Google Speech API. It will work with any OpenTok application that is auto-configured to push to S3.
 
+![OpenTok Labs](https://d26dzxoao6i3hh.cloudfront.net/items/0U1R0a0e2g1E361H0x3c/Image%202017-11-22%20at%2012.16.38%20PM.png?v=2507a2df)
+
 You can easily deploy this demo to Heroku using the deploy button below. Or, read on if you want to deploy it to anywhere else.
 
 This application includes the server to transcribe the archives, a HTTP JSON API to fetch the transcripts and a web client to access the transcripts.
