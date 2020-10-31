@@ -12,14 +12,14 @@ const CONFIG = {}
 
 // Array of arrays specifying required environment vars. Item 0 is name of env var. Item 1 is optional default value.
 const reqEnvVars = [
-  [ 'PORT', 8080 ],
-  [ 'OPENTOK_API_KEY' ],
-  [ 'AWS_S3_BUCKET_NAME' ],
-  [ 'AWS_ACCESS_KEY_ID' ],
-  [ 'AWS_SECRET_ACCESS_KEY' ],
-  [ 'GOOGLE_STORAGE_BUCKET' ],
-  [ 'GOOGLE_APPLICATION_CREDENTIALS', 'service-account-file.json' ],
-  [ 'GOOGLE_APPLICATION_CREDENTIALS_JSON', 0 ]
+  ['PORT', 8080],
+  ['OPENTOK_API_KEY'],
+  ['AWS_S3_BUCKET_NAME'],
+  ['AWS_ACCESS_KEY_ID'],
+  ['AWS_SECRET_ACCESS_KEY'],
+  ['GOOGLE_STORAGE_BUCKET'],
+  ['GOOGLE_APPLICATION_CREDENTIALS', 'service-account-file.json'],
+  ['GOOGLE_APPLICATION_CREDENTIALS_JSON', 0]
 ]
 
 // Validate configs are present and set defaults
