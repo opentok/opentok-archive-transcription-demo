@@ -14,6 +14,7 @@ const CONFIG = {}
 const reqEnvVars = [
   ['PORT', 8080],
   ['OPENTOK_API_KEY'],
+  ['OPENTOK_API_SECRET'],
   ['AWS_S3_BUCKET_NAME'],
   ['AWS_ACCESS_KEY_ID'],
   ['AWS_SECRET_ACCESS_KEY'],
