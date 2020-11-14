@@ -222,7 +222,7 @@ class Archive {
     const zipStream = this.downloadArchiveFromS3(archiveId, true)
     const zipPath = path.join(this._tmpdir, `${archiveId}.zip`)
     const archiveOutput = fs.createWriteStream(zipPath)
-    let streamsTranscribed = []
+    const streamsTranscribed = []
     let manifest = {}
 
     archiveOutput.on('finish', () => {
